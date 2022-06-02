@@ -17,6 +17,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpGet]
+        [Route("getproductos")]
         public async Task<IEnumerable<Productos>> GetProductos()               
         {        
 
