@@ -52,6 +52,8 @@ namespace PersonasAPI_v2.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("addproduct")]
         public async Task<IActionResult> AddProductWithCategory([FromBody] Productos product) 
         {
             try
@@ -76,13 +78,10 @@ namespace PersonasAPI_v2.Controllers
                 {
                     return BadRequest("No se pudo guardar la información");
                 }
-
             }
             catch (Exception e) {
-
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
-            }     
-        
+            }           
         }
 
         [HttpGet("{idProduct}", Name = "GetProductById")]
@@ -135,7 +134,6 @@ namespace PersonasAPI_v2.Controllers
             }           
         }
 
-
         [HttpGet("{idCategory}", Name = "GetCategoryById")]
         [Route("getcategorybyid")] //-> /api/productos/getcategorybyid
         public async Task<ActionResult<ProductoCategoria>> GetCategoryById([FromQuery] int idCategory)
@@ -154,6 +152,5 @@ namespace PersonasAPI_v2.Controllers
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
             }
         }
-
     }
 }

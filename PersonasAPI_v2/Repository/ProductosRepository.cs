@@ -75,7 +75,7 @@ namespace PersonasAPI_v2.Repository
             {
                 using (var db = _appDbContext)
                 {
-                    result = await db.Productos.Include(c => c.ProductoCategoria).Where(item => item.ID_PRODUCTO == idProduct).FirstAsync();
+                    result = await db.Productos.Where(item => item.ID_PRODUCTO == idProduct).FirstAsync();
                 }
             }
             return result;

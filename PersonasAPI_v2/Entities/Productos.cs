@@ -12,7 +12,7 @@ namespace PersonasAPI_v2.Entities
         [Display(Name = "ID_PRODCATEGORIA")]
         [ForeignKey("ProductoCategoria")]
         public int ID_PRODCATEGORIA { get; set; }
-        public virtual ProductoCategoria ProductoCategoria { get; set; }
+        public virtual ProductoCategoria? ProductoCategoria { get; set; }
 
         [Required(ErrorMessage = "Debe ingresar un nombre")]
         [Display(Name = "NOMBRE")]
