@@ -15,7 +15,7 @@ namespace PersonasAPI_v2.Repository
 
         public async Task<IEnumerable<Productos>> GetAllProductos()
         {
-            IQueryable<Productos> query = _appDbContext.Productos.Include(c => c.ProductoCategoria);
+            IQueryable<Productos> query = _appDbContext.Productos;
 
             return await query.ToListAsync();
             //return await db.Productos.OrderBy(f => f.NOMBRE).ToListAsync();
@@ -24,6 +24,15 @@ namespace PersonasAPI_v2.Repository
         public async Task<IEnumerable<ProductoCategoria>> GetAllCategorias()
         {
             IQueryable<ProductoCategoria> query = _appDbContext.ProductoCategoria;
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Productos>> GetProducsByCategory(int idCategory)
+        {
+            IQueryable<Productos> query = _appDbContext.Productos;
+
+            query.Where(item => item.ID_PRODCATEGORIA == idCategory).Include(c => c.ProductoCategoria);
 
             return await query.ToListAsync();
         }
@@ -92,6 +101,17 @@ namespace PersonasAPI_v2.Repository
             prod.STOCK_MIN = productos.STOCK_MIN;
             prod.USUARIO = productos.USUARIO;
 
+            result = await _appDbContext.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<int> DeleteProduct(int idProduct) {
+
+            var result = 0;
+
+            var prod = await _appDbContext.Productos.Where(item => item.ID_PRODUCTO == idProduct).FirstAsync();
+            _appDbContext.Remove(prod);
             result = await _appDbContext.SaveChangesAsync();
 
             return result;

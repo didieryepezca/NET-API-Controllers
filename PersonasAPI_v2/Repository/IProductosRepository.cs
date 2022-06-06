@@ -8,6 +8,8 @@ namespace PersonasAPI_v2.Repository
 
         Task<IEnumerable<ProductoCategoria>> GetAllCategorias();
 
+        Task<IEnumerable<Productos>> GetProducsByCategory(int idCategory);
+
         Task<int> InsertProductWithCategory(Productos productos);
 
         Task<Productos> GetProductById(int idProduct);
@@ -19,5 +21,7 @@ namespace PersonasAPI_v2.Repository
         Task<int> UpdateCategoria(ProductoCategoria categoria);
 
         Task<int> UpdateProduct(Productos productos);
+
+        Task<int> DeleteProduct(int idProduct);
     }
 }

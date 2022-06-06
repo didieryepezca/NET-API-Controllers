@@ -8,29 +8,31 @@ namespace PersonasAPI_v2.Controllers
     [ApiController]
     public class ProductosController : ControllerBase
     {
-        private readonly IProductosRepository _productoRepo;        
+        private readonly IProductosRepository _productoRepo;
 
-        public ProductosController(IProductosRepository productoRepo) {
+        public ProductosController(IProductosRepository productoRepo)
+        {
 
-            _productoRepo = productoRepo;            
+            _productoRepo = productoRepo;
         }
 
         [HttpGet]
         [Route("getproducts")] //-> /api/productos/getproductos
-        public async Task<ActionResult<IEnumerable<Productos>>> GetProducts()               
+        public async Task<ActionResult<IEnumerable<Productos>>> GetProducts()
         {
             try
             {
                 var productos = await _productoRepo.GetAllProductos();
-                if (productos.Count() == 0) {
-                    return NotFound();                    
-                }                
+                if (productos.Count() == 0)
+                {
+                    return NotFound();
+                }
                 return Ok(productos);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
-            }            
+            }
         }
 
         [HttpGet]
@@ -54,7 +56,7 @@ namespace PersonasAPI_v2.Controllers
 
         [HttpPost]
         [Route("addproduct")]
-        public async Task<IActionResult> AddProductWithCategory([FromBody] Productos product) 
+        public async Task<IActionResult> AddProductWithCategory([FromBody] Productos product)
         {
             try
             {
@@ -79,9 +81,10 @@ namespace PersonasAPI_v2.Controllers
                     return BadRequest("No se pudo guardar la información");
                 }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
-            }           
+            }
         }
 
         [HttpGet("{idProduct}", Name = "GetProductById")]
@@ -109,12 +112,14 @@ namespace PersonasAPI_v2.Controllers
         {
             try
             {
-                if (prodCategory is null) {
+                if (prodCategory is null)
+                {
 
                     return BadRequest("No ingreso una categoria");
                 }
 
-                if (!ModelState.IsValid) {
+                if (!ModelState.IsValid)
+                {
 
                     return BadRequest("Categoria inválida");
                 }
@@ -125,13 +130,15 @@ namespace PersonasAPI_v2.Controllers
                     //return Accepted("Se añadió la categoria");
                     return CreatedAtRoute("GetCategoryById", new { idCategory = prodCategory.ID_PRODCATEGORIA }, prodCategory);
                 }
-                else {
-                    return BadRequest("No se pudo guardar la información");                     
-                }                
+                else
+                {
+                    return BadRequest("No se pudo guardar la información");
+                }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
-            }           
+            }
         }
 
         [HttpGet("{idCategory}", Name = "GetCategoryById")]
@@ -153,12 +160,12 @@ namespace PersonasAPI_v2.Controllers
             }
         }
 
-        [HttpPut("{idCategory:int}")]
+        [HttpPut]
         [Route("updatecategory")]
         public async Task<IActionResult> UpdateCategory([FromBody] ProductoCategoria category)
         {
             try
-            {           
+            {
                 if (category is null)
                 {
                     return BadRequest("No ingreso una categoria");
@@ -178,19 +185,21 @@ namespace PersonasAPI_v2.Controllers
                 var categoryUp = await _productoRepo.UpdateCategoria(category);
                 if (categoryUp > 0)
                 {
-                    return AcceptedAtRoute("GetCategoryById", new { idCategory = category.ID_PRODCATEGORIA }, category);                    
+                    return AcceptedAtRoute("GetCategoryById", new { idCategory = category.ID_PRODCATEGORIA }, category);
                 }
-                else {
+                else
+                {
                     return BadRequest("No se pudo actualizar la información");
                 }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
 
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
-            }        
+            }
         }
 
-        [HttpPut("{idProduct:int}")]
+        [HttpPut]
         [Route("updateproduct")]
         public async Task<IActionResult> UpdateProduct([FromBody] Productos producto)
         {
@@ -215,7 +224,7 @@ namespace PersonasAPI_v2.Controllers
                 var productUp = await _productoRepo.UpdateProduct(producto);
                 if (productUp > 0)
                 {
-                    return AcceptedAtRoute("GetCategoryById", new { idProduct = producto.ID_PRODCATEGORIA }, producto);
+                    return AcceptedAtRoute("GetProductById", new { idProduct = producto.ID_PRODUCTO }, producto);
                 }
                 else
                 {
@@ -228,5 +237,53 @@ namespace PersonasAPI_v2.Controllers
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
             }
         }
+
+        [HttpDelete]
+        [Route("deleteproduct")]
+        public async Task<IActionResult> DeleteProduct([FromQuery] int idProduct)
+        {
+            try
+            {
+                var prodFind = await _productoRepo.GetProductById(idProduct);
+                if (prodFind == null)
+                {
+                    return NotFound($"Producto con Id = {idProduct} no hallado.");
+                }
+
+                var productDe = await _productoRepo.DeleteProduct(idProduct);
+                if (productDe > 0)
+                {
+                    return Accepted();
+                }
+
+                return Accepted();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Error interno del servidor.. " + e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("getproductsbycategoryid")]
+        public async Task<ActionResult<IEnumerable<Productos>>> GetProductsByCategoryId([FromQuery] int cateId) 
+        {
+            try
+            {
+                var prodsByCat = await _productoRepo.GetProducsByCategory(cateId);
+                if (prodsByCat == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(prodsByCat);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Error interno del servidor.. " + e.Message);
+            }
+        }
+
+
     }
 }
