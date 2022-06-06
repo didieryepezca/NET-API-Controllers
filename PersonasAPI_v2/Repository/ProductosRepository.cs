@@ -52,7 +52,7 @@ namespace PersonasAPI_v2.Repository
             {
                 using (var db = _appDbContext)
                 {
-                    result = await db.ProductoCategoria.Where(item => item.ID_PRODCATEGORIA == idCategory).FirstAsync();
+                    result = await db.ProductoCategoria.Where(item => item.ID_PRODCATEGORIA == idCategory).FirstAsync();                   
                 }
             }
             return result;
@@ -79,7 +79,22 @@ namespace PersonasAPI_v2.Repository
                 }
             }
             return result;
-        }       
+        }
 
+        public async Task<int> UpdateCategoria(ProductoCategoria categoria) {
+
+            var result = 0;
+
+            using (var db = _appDbContext) 
+            { 
+                var cate = await db.ProductoCategoria.Where(item=> item.ID_PRODCATEGORIA == categoria.ID_PRODCATEGORIA).FirstAsync();
+
+                cate.NOMBRE = categoria.NOMBRE;
+                cate.FECHA_CREACION = categoria.FECHA_CREACION;
+
+                result = await db.SaveChangesAsync();                
+            }
+            return result;
+        }
     }
 }

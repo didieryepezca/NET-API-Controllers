@@ -15,5 +15,8 @@ namespace PersonasAPI_v2.Repository
         Task<int> InsertProductCategory(ProductoCategoria productoCategoria);
 
         Task<ProductoCategoria> GetCategoriaById(int idCategory);
+
+        Task<int> UpdateCategoria(ProductoCategoria categoria);
+
     }
 }

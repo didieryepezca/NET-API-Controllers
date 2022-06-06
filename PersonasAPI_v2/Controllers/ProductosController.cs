@@ -152,5 +152,42 @@ namespace PersonasAPI_v2.Controllers
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
             }
         }
+
+        [HttpPut("{idCategory:int}")]
+        [Route("updatecategory")]
+        public async Task<IActionResult> UpdateCategory([FromBody] ProductoCategoria category)
+        {
+            try
+            {           
+                if (category is null)
+                {
+                    return BadRequest("No ingreso una categoria");
+                }
+
+                var categToUp = _productoRepo.GetCategoriaById(category.ID_PRODCATEGORIA);
+                if (categToUp == null)
+                {
+                    return NotFound($"Categoria con Id = {category.ID_PRODCATEGORIA} no hallada.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Categoria inválida");
+                }
+
+                var categoryUp = await _productoRepo.UpdateCategoria(category);
+                if (categoryUp > 0)
+                {
+                    return AcceptedAtRoute("GetCategoryById", new { idCategory = category.ID_PRODCATEGORIA }, categoryUp);                    
+                }
+                else {
+                    return BadRequest("No se pudo guardar la información");
+                }
+            }
+            catch (Exception e) {
+                return StatusCode(500, "Error interno del servidor.. " + e.Message);
+            }        
+        }
+
     }
 }
