@@ -164,8 +164,8 @@ namespace PersonasAPI_v2.Controllers
                     return BadRequest("No ingreso una categoria");
                 }
 
-                var categToUp = _productoRepo.GetCategoriaById(category.ID_PRODCATEGORIA);
-                if (categToUp == null)
+                var catefind = await _productoRepo.GetCategoriaById(category.ID_PRODCATEGORIA);
+                if (catefind == null)
                 {
                     return NotFound($"Categoria con Id = {category.ID_PRODCATEGORIA} no hallada.");
                 }
@@ -178,16 +178,55 @@ namespace PersonasAPI_v2.Controllers
                 var categoryUp = await _productoRepo.UpdateCategoria(category);
                 if (categoryUp > 0)
                 {
-                    return AcceptedAtRoute("GetCategoryById", new { idCategory = category.ID_PRODCATEGORIA }, categoryUp);                    
+                    return AcceptedAtRoute("GetCategoryById", new { idCategory = category.ID_PRODCATEGORIA }, category);                    
                 }
                 else {
-                    return BadRequest("No se pudo guardar la información");
+                    return BadRequest("No se pudo actualizar la información");
                 }
             }
             catch (Exception e) {
+
                 return StatusCode(500, "Error interno del servidor.. " + e.Message);
             }        
         }
 
+        [HttpPut("{idProduct:int}")]
+        [Route("updateproduct")]
+        public async Task<IActionResult> UpdateProduct([FromBody] Productos producto)
+        {
+            try
+            {
+                if (producto is null)
+                {
+                    return BadRequest("No ingreso una categoria");
+                }
+
+                var prodFind = await _productoRepo.GetProductById(producto.ID_PRODUCTO);
+                if (prodFind == null)
+                {
+                    return NotFound($"Producto con Id = {producto.ID_PRODUCTO} no hallado.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Producto inválido");
+                }
+
+                var productUp = await _productoRepo.UpdateProduct(producto);
+                if (productUp > 0)
+                {
+                    return AcceptedAtRoute("GetCategoryById", new { idProduct = producto.ID_PRODCATEGORIA }, producto);
+                }
+                else
+                {
+                    return BadRequest("No se pudo actualizar la información");
+                }
+            }
+            catch (Exception e)
+            {
+
+                return StatusCode(500, "Error interno del servidor.. " + e.Message);
+            }
+        }
     }
 }

@@ -15,45 +15,34 @@ namespace PersonasAPI_v2.Repository
 
         public async Task<IEnumerable<Productos>> GetAllProductos()
         {
-            using (var db = _appDbContext)
-            {
-                IQueryable<Productos> query = db.Productos.Include(c => c.ProductoCategoria);
+            IQueryable<Productos> query = _appDbContext.Productos.Include(c => c.ProductoCategoria);
 
-                return await query.ToListAsync();
-                //return await db.Productos.OrderBy(f => f.NOMBRE).ToListAsync();
-            }
+            return await query.ToListAsync();
+            //return await db.Productos.OrderBy(f => f.NOMBRE).ToListAsync();
         }
 
         public async Task<IEnumerable<ProductoCategoria>> GetAllCategorias()
         {
-            using (var db = _appDbContext)
-            {
-                IQueryable<ProductoCategoria> query = db.ProductoCategoria;
+            IQueryable<ProductoCategoria> query = _appDbContext.ProductoCategoria;
 
-                return await query.ToListAsync();
-                //return await db.Productos.OrderBy(f => f.NOMBRE).ToListAsync();
-            }
+            return await query.ToListAsync();
         }
 
-        public async Task<int> InsertProductCategory(ProductoCategoria productoCategoria) 
+        public async Task<int> InsertProductCategory(ProductoCategoria productoCategoria)
         {
             var result = 0;
-            using (var db = _appDbContext) {
 
-                await db.AddAsync(productoCategoria);
-                result = db.SaveChanges();                       
-            }
-            return result;               
+            await _appDbContext.AddAsync(productoCategoria);
+            result = _appDbContext.SaveChanges();
+
+            return result;
         }
 
         public async Task<ProductoCategoria> GetCategoriaById(int idCategory)
         {
             var result = new ProductoCategoria();
             {
-                using (var db = _appDbContext)
-                {
-                    result = await db.ProductoCategoria.Where(item => item.ID_PRODCATEGORIA == idCategory).FirstAsync();                   
-                }
+                result = await _appDbContext.ProductoCategoria.Where(item => item.ID_PRODCATEGORIA == idCategory).FirstAsync();
             }
             return result;
         }
@@ -61,10 +50,9 @@ namespace PersonasAPI_v2.Repository
         public async Task<int> InsertProductWithCategory(Productos productos)
         {
             var result = 0;
-            using (var db = _appDbContext)
             {
-                await db.AddAsync(productos);
-                result = db.SaveChanges();
+                await _appDbContext.AddAsync(productos);
+                result = _appDbContext.SaveChanges();
             }
             return result;
         }
@@ -72,28 +60,40 @@ namespace PersonasAPI_v2.Repository
         public async Task<Productos> GetProductById(int idProduct)
         {
             var result = new Productos();
-            {
-                using (var db = _appDbContext)
-                {
-                    result = await db.Productos.Where(item => item.ID_PRODUCTO == idProduct).FirstAsync();
-                }
+            {               
+               result = await _appDbContext.Productos.Where(item => item.ID_PRODUCTO == idProduct).FirstAsync();               
             }
             return result;
         }
 
-        public async Task<int> UpdateCategoria(ProductoCategoria categoria) {
+        public async Task<int> UpdateCategoria(ProductoCategoria categoria)
+        {
+            var result = 0;           
+            var cate = await _appDbContext.ProductoCategoria.Where(item => item.ID_PRODCATEGORIA == categoria.ID_PRODCATEGORIA).FirstAsync();
 
+            cate.NOMBRE = categoria.NOMBRE;
+            cate.FECHA_CREACION = categoria.FECHA_CREACION;
+
+            result = await _appDbContext.SaveChangesAsync();
+           
+            return result;
+        }
+
+        public async Task<int> UpdateProduct(Productos productos)
+        {
             var result = 0;
+            var prod = await _appDbContext.Productos.Where(item => item.ID_PRODUCTO == productos.ID_PRODUCTO).FirstAsync();
 
-            using (var db = _appDbContext) 
-            { 
-                var cate = await db.ProductoCategoria.Where(item=> item.ID_PRODCATEGORIA == categoria.ID_PRODCATEGORIA).FirstAsync();
+            prod.ID_PRODCATEGORIA = productos.ID_PRODCATEGORIA;
+            prod.NOMBRE = productos.NOMBRE;
+            prod.DESCRIPCION = productos.DESCRIPCION;
+            prod.STOCK = productos.STOCK;
+            prod.UNIDAD_MEDIDA = productos.UNIDAD_MEDIDA;
+            prod.STOCK_MIN = productos.STOCK_MIN;
+            prod.USUARIO = productos.USUARIO;
 
-                cate.NOMBRE = categoria.NOMBRE;
-                cate.FECHA_CREACION = categoria.FECHA_CREACION;
+            result = await _appDbContext.SaveChangesAsync();
 
-                result = await db.SaveChangesAsync();                
-            }
             return result;
         }
     }

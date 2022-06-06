@@ -18,5 +18,6 @@ namespace PersonasAPI_v2.Repository
 
         Task<int> UpdateCategoria(ProductoCategoria categoria);
 
+        Task<int> UpdateProduct(Productos productos);
     }
 }
