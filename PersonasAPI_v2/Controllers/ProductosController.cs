@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PersonasAPI_v2.Entities;
 using PersonasAPI_v2.Repository;
+using PersonasAPI_v2.Services;
 
 namespace PersonasAPI_v2.Controllers
 {
@@ -9,14 +11,38 @@ namespace PersonasAPI_v2.Controllers
     public class ProductosController : ControllerBase
     {
         private readonly IProductosRepository _productoRepo;
+        private readonly IJwtService _jwtService;
 
-        public ProductosController(IProductosRepository productoRepo)
+        public ProductosController(IProductosRepository productoRepo, IJwtService jwtService)
         {
-
             _productoRepo = productoRepo;
+            _jwtService = jwtService;
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("generarsession")] //-> /api/productos/getproductos
+        public string AuthApiWithJWT()
+        {
+            try
+            {
+                var token =  _jwtService.GenerateToken();
+                if (token != string.Empty)
+                {
+                    return token;
+                }
+                else {
+                    return "No se ha podido generar un token";
+                }               
+            }
+            catch (Exception e)
+            {
+                return "Error interno del servidor.. " + e.Message;
+            }
         }
 
         [HttpGet]
+        [Authorize]
         [Route("getproducts")] //-> /api/productos/getproductos
         public async Task<ActionResult<IEnumerable<Productos>>> GetProducts()
         {
@@ -36,6 +62,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("getcategorys")] //-> /api/productos/getcategorias
         public async Task<ActionResult<IEnumerable<ProductoCategoria>>> GetCategorys()
         {
@@ -55,6 +82,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("addproduct")]
         public async Task<IActionResult> AddProductWithCategory([FromBody] Productos product)
         {
@@ -88,6 +116,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpGet("{idProduct}", Name = "GetProductById")]
+        [Authorize]
         [Route("getproductbyid")] //-> /api/productos/getcategorybyid
         public async Task<ActionResult<Productos>> GetProductById([FromQuery] int idProduct)
         {
@@ -107,6 +136,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("addproductcategory")]
         public async Task<IActionResult> AddProductCategory([FromBody] ProductoCategoria prodCategory)
         {
@@ -142,6 +172,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpGet("{idCategory}", Name = "GetCategoryById")]
+        [Authorize]
         [Route("getcategorybyid")] //-> /api/productos/getcategorybyid
         public async Task<ActionResult<ProductoCategoria>> GetCategoryById([FromQuery] int idCategory)
         {
@@ -161,6 +192,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("updatecategory")]
         public async Task<IActionResult> UpdateCategory([FromBody] ProductoCategoria category)
         {
@@ -200,6 +232,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("updateproduct")]
         public async Task<IActionResult> UpdateProduct([FromBody] Productos producto)
         {
@@ -239,6 +272,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("deleteproduct")]
         public async Task<IActionResult> DeleteProduct([FromQuery] int idProduct)
         {
@@ -265,6 +299,7 @@ namespace PersonasAPI_v2.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("getproductsbycategoryid")]
         public async Task<ActionResult<IEnumerable<Productos>>> GetProductsByCategoryId([FromQuery] int cateId) 
         {
